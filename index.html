@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة دلوعتي ❤️</title>
+    <style>
+        :root {
+            --bg-color: #080808;
+            --main-red: #e63946;
+            --dark-red: #9e1b24;
+            --accent-gold: #ffb703;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Arabic Typesetting, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 95%;
+            max-width: 520px;
+            background: rgba(18, 18, 18, 0.95);
+            border: 3px solid var(--main-red);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(230, 57, 70, 0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--main-red);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.6);
+        }
+
+        h2 {
+            color: var(--accent-gold);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--main-red), var(--dark-red));
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.7);
+        }
+
+        .stage {
+            display: none;
+        }
+
+        .stage.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ساحة اللعب */
+        .play-area {
+            height: 250px;
+            background: radial-gradient(circle, #1a0507 0%, #000000 100%);
+            border: 2px dashed var(--main-red);
+            border-radius: 18px;
+            position: relative;
+            overflow: hidden;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .falling-item {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            animation: fall 3.5s linear forwards;
+            filter: drop-shadow(0 0 5px var(--accent-gold));
+        }
+
+        @keyframes fall {
+            0% { top: -15%; opacity: 1; }
+            100% { top: 105%; opacity: 0.2; }
+        }
+
+        /* كروت الخيارات */
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .card-item {
+            background: #141414;
+            border: 2px solid var(--main-red);
+            border-radius: 15px;
+            padding: 12px 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .card-item:hover {
+            border-color: var(--accent-gold);
+            transform: scale(1.05);
+            background: #22080a;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .hearts-bg {
+            font-size: 2.5rem;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- المرحلة 0: ازيك يا مسكر -->
+    <div id="stage-0" class="stage active">
+        <h1>ازيك يا مسكر 👋❤️</h1>
+        <p>الفيلم واللعبة دول معمولين مخصوص عشان أجمل وبنوتة ودلوعة في الدنيا كلها!</p>
+        <p>جاهزة نلعب ونعمل مغامرة سوا؟ ✨</p>
+        <button class="btn" onclick="nextStage(1)">يلا بيناااا نبدا اللعبة يدلوعتيييي 🚀</button>
+    </div>
+
+    <!-- المرحلة 1: صيد النجوم -->
+    <div id="stage-1" class="stage">
+        <h2>نجوم الليل لعيونك 🌌</h2>
+        <p>زي ما بنحب نتفرج على النجوم سوا.. صادي 5 نجوم طالعين في السماء عشان تفتحي المرحلة اللي بعد كده!</p>
+        <div class="play-area" id="star-sky"></div>
+        <div class="score-board">النجوم اللي جمعتيها: <span id="star-count">0</span> / 5 ⭐</div>
+    </div>
+
+    <!-- المرحلة 2: فوانيس روبانزل وموانا -->
+    <div id="stage-2" class="stage">
+        <h2>عالم موانا وروبانزل 🏮🌊</h2>
+        <p>الفوانيس المضيئة طايرة حول الأميرة! اضغطي على 5 فوانيس من فوانيس روبانزل المضيئة عشان نعدي للبحر!</p>
+        <div class="play-area" id="lantern-area"></div>
+        <div class="score-board">الفوانيس المجمعة: <span id="lantern-count">0</span> / 5 🏮</div>
+    </div>
+
+    <!-- المرحلة 3: تجميع الأكل المفضّل -->
+    <div id="stage-3" class="stage">
+        <h2>بوفيه الدلوعة (تجميع الأكل) 🍽️</h2>
+        <p>الأكل المفضّل ليكي نازل من السماء! صادي 5 أكلات (حواوشي، محشي ورق عنب، سي فود) بالضغط عليهم!</p>
+        <div class="play-area" id="food-area"></div>
+        <div class="score-board">الوجبات المجمعة: <span id="food-count">0</span> / 5 🍲</div>
+    </div>
+
+    <!-- المرحلة 4: لعبة ألوان الحب والعصافير -->
+    <div id="stage-4" class="stage">
+        <h2>عصافير الحب والألوان المفضلة 🕊️🔴🖤</h2>
+        <p>اطعمي العصفور بألوانك المفضلة (الأحمر والأسود فقط)! خذ بالك واضغطي على القلوب الحمراء أو السوداء وتجنبي باقي الألوان!</p>
+        <div class="play-area" id="color-bird-area"></div>
+        <div class="score-board">النقاط: <span id="bird-score">0</span> / 5 💖</div>
+    </div>
+
+    <!-- المرحلة 5: اشطر كتكوتة -->
+    <div id="stage-5" class="stage">
+        <div class="hearts-bg">🥳🎉💖</div>
+        <h1>اشطر كتكوتة كدا كدا والله بحبككككك ❤️🔥</h1>
+        <p>عديتي كل المراحل ولعبتي زي المحترفين يا أجمل دلوعة في الدنيا كلللللهااا</p>
+        <button class="btn" onclick="nextStage(6)">افتحي الرسالة الأخيرة 💌</button>
+    </div>
+
+    <!-- المرحلة 6: الرسالة الخاصة -->
+    <div id="stage-6" class="stage">
+        <h2>أنتِ كل دنيتي ❤️</h2>
+        <p>يا أرق وأجمل بنوتة ودلوعة في الدنيا كلهاا وجودك بيخلي كل حاجة في حياتي أحلى وأجمل من اي حاجة تانية حصلتلي او حسيت بيها بحبك طول عمري وطول عمري دماغي ليكي انتي بعشقكك ينور عيني وربنا يخليكي ليا </p>
+        <p>مهما لعبنا ومهما شفنا نجوم ومناظر خلابة بتفضلي أنتي النجمة والمنظر الأجمل اللي سارق قلبي وعيني بحبك أوي أوي أوي 🌹🖤</p>
+        <div style="font-size: 3rem; margin-top: 15px;">🕊️❤️✨</div>
+    </div>
+</div>
+
+<script>
+    let currentStage = 0;
+    let starScore = 0;
+    let lanternScore = 0;
+    let foodScore = 0;
+    let birdScore = 0;
+    let intervalId = null;
+
+    function nextStage(stageNum) {
+        if (intervalId) clearInterval(intervalId);
+        document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
+        document.getElementById(`stage-${stageNum}`).classList.add('active');
+        currentStage = stageNum;
+
+        if (stageNum === 1) startStarGame();
+        if (stageNum === 2) startLanternGame();
+        if (stageNum === 3) startFoodGame();
+        if (stageNum === 4) startBirdGame();
+    }
+
+    // لعبة النجوم
+    function startStarGame() {
+        const sky = document.getElementById('star-sky');
+        sky.innerHTML = '';
+        intervalId = setInterval(() => {
+            if (currentStage !== 1) return;
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+            item.innerText = '⭐';
+            item.style.left = Math.random() * 80 + 10 + '%';
+            item.onclick = () => {
+                item.remove();
+                starScore++;
+                document.getElementById('star-count').innerText = starScore;
+                if (starScore >= 5) {
+                    clearInterval(intervalId);
+                    setTimeout(() => nextStage(2), 400);
+                }
+            };
+            sky.appendChild(item);
+            setTimeout(() => item.remove(), 3500);
+        }, 700);
+    }
+
+    // لعبة الفوانيس
+    function startLanternGame() {
+        const area = document.getElementById('lantern-area');
+        area.innerHTML = '';
+        intervalId = setInterval(() => {
+            if (currentStage !== 2) return;
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+            item.innerText = Math.random() > 0.5 ? '🏮' : '🌊';
+            item.style.left = Math.random() * 80 + 10 + '%';
+            item.onclick = () => {
+                item.remove();
+                lanternScore++;
+                document.getElementById('lantern-count').innerText = lanternScore;
+                if (lanternScore >= 5) {
+                    clearInterval(intervalId);
+                    setTimeout(() => nextStage(3), 400);
+                }
+            };
+            area.appendChild(item);
+            setTimeout(() => item.remove(), 3500);
+        }, 700);
+    }
+
+    // لعبة تجميع الأكل
+    function startFoodGame() {
+        const foods = ['🥩', '🍲', '🦐']; // حواوشي، محشي، سي فود
+        const area = document.getElementById('food-area');
+        area.innerHTML = '';
+        intervalId = setInterval(() => {
+            if (currentStage !== 3) return;
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+            item.innerText = foods[Math.floor(Math.random() * foods.length)];
+            item.style.left = Math.random() * 80 + 10 + '%';
+            item.onclick = () => {
+                item.remove();
+                foodScore++;
+                document.getElementById('food-count').innerText = foodScore;
+                if (foodScore >= 5) {
+                    clearInterval(intervalId);
+                    setTimeout(() => nextStage(4), 400);
+                }
+            };
+            area.appendChild(item);
+            setTimeout(() => item.remove(), 3500);
+        }, 700);
+    }
+
+    // لعبة عصافير الألوان (أحمر وأسود)
+    function startBirdGame() {
+        const icons = [
+            { icon: '❤️', valid: true },
+            { icon: '🖤', valid: true },
+            { icon: '💛', valid: false },
+            { icon: '💙', valid: false }
+        ];
+        const area = document.getElementById('color-bird-area');
+        area.innerHTML = '';
+        intervalId = setInterval(() => {
+            if (currentStage !== 4) return;
+            const choice = icons[Math.floor(Math.random() * icons.length)];
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+            item.innerText = choice.icon;
+            item.style.left = Math.random() * 80 + 10 + '%';
+            item.onclick = () => {
+                item.remove();
+                if (choice.valid) {
+                    birdScore++;
+                    document.getElementById('bird-score').innerText = birdScore;
+                    if (birdScore >= 5) {
+                        clearInterval(intervalId);
+                        setTimeout(() => nextStage(5), 400);
+                    }
+                }
+            };
+            area.appendChild(item);
+            setTimeout(() => item.remove(), 3500);
+        }, 650);
+    }
+</script>
+
+</body>
+</html>
